@@ -7,9 +7,16 @@ const getPdfParse = async () => {
   return pdfParse.default || pdfParse;
 };
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy-load OpenAI client
+let openaiClient: OpenAI | null = null;
+function getOpenAIClient() {
+  if (!openaiClient && process.env.OPENAI_API_KEY) {
+    openaiClient = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  }
+  return openaiClient;
+}
 
 // Zod schemas for validation
 const ExtractedEntitySchema = z.object({
