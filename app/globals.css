@@ -1,46 +1,162 @@
 @import "tailwindcss";
 
+/* TaxFlow Brand Colors - Warm Trust Palette */
 :root {
-  --background: 0 0% 100%;
-  --foreground: 240 10% 3.9%;
-  --card: 0 0% 100%;
-  --card-foreground: 240 10% 3.9%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 240 10% 3.9%;
-  --primary: 240 5.9% 10%;
+  /* Primary - Deep forest green (trustworthy, calming) */
+  --primary: 149 70% 20%;
   --primary-foreground: 0 0% 98%;
-  --secondary: 240 4.8% 95.9%;
-  --secondary-foreground: 240 5.9% 10%;
-  --muted: 240 4.8% 95.9%;
-  --muted-foreground: 240 3.8% 46.1%;
-  --accent: 240 4.8% 95.9%;
-  --accent-foreground: 240 5.9% 10%;
-  --destructive: 0 84.2% 60.2%;
+  
+  /* Accent - Warm amber (optimism, energy) */
+  --accent-amber: 38 92% 50%;
+  --accent-amber-foreground: 0 0% 10%;
+  
+  /* Supporting - Soft sage (approachable backgrounds) */
+  --sage: 120 25% 85%;
+  --sage-foreground: 149 50% 15%;
+  
+  /* Neutral - Warm grays (cream whites, not stark) */
+  --background: 40 20% 97%;
+  --foreground: 20 10% 15%;
+  
+  /* Card/Surface colors */
+  --card: 0 0% 100%;
+  --card-foreground: 20 10% 15%;
+  
+  /* Popover */
+  --popover: 0 0% 100%;
+  --popover-foreground: 20 10% 15%;
+  
+  /* Secondary - Warm neutral */
+  --secondary: 40 15% 92%;
+  --secondary-foreground: 149 70% 20%;
+  
+  /* Muted - Warm gray */
+  --muted: 40 15% 92%;
+  --muted-foreground: 20 10% 45%;
+  
+  /* Accent (for UI elements) */
+  --accent: 40 15% 92%;
+  --accent-foreground: 149 70% 20%;
+  
+  /* Success - Brighter green */
+  --success: 142 71% 45%;
+  --success-foreground: 0 0% 98%;
+  
+  /* Alert - Soft coral (not aggressive) */
+  --destructive: 12 76% 61%;
   --destructive-foreground: 0 0% 98%;
-  --border: 240 5.9% 90%;
-  --input: 240 5.9% 90%;
-  --ring: 240 5.9% 10%;
-  --radius: 0.5rem;
+  
+  /* Warning - Soft amber */
+  --warning: 38 92% 50%;
+  --warning-foreground: 0 0% 10%;
+  
+  /* Borders and inputs */
+  --border: 40 15% 88%;
+  --input: 40 15% 88%;
+  --ring: 149 70% 20%;
+  
+  /* Radius */
+  --radius: 0.75rem;
 }
 
 .dark {
-  --background: 240 10% 3.9%;
-  --foreground: 0 0% 98%;
-  --card: 240 10% 3.9%;
-  --card-foreground: 0 0% 98%;
-  --popover: 240 10% 3.9%;
-  --popover-foreground: 0 0% 98%;
-  --primary: 0 0% 98%;
-  --primary-foreground: 240 5.9% 10%;
-  --secondary: 240 3.7% 15.9%;
-  --secondary-foreground: 0 0% 98%;
-  --muted: 240 3.7% 15.9%;
-  --muted-foreground: 240 5% 64.9%;
-  --accent: 240 3.7% 15.9%;
-  --accent-foreground: 0 0% 98%;
-  --destructive: 0 62.8% 30.6%;
+  --primary: 149 50% 40%;
+  --primary-foreground: 0 0% 98%;
+  
+  --accent-amber: 38 92% 50%;
+  --accent-amber-foreground: 0 0% 10%;
+  
+  --sage: 120 20% 25%;
+  --sage-foreground: 120 25% 85%;
+  
+  --background: 20 15% 8%;
+  --foreground: 40 20% 95%;
+  
+  --card: 20 15% 10%;
+  --card-foreground: 40 20% 95%;
+  
+  --popover: 20 15% 10%;
+  --popover-foreground: 40 20% 95%;
+  
+  --secondary: 20 15% 15%;
+  --secondary-foreground: 40 20% 95%;
+  
+  --muted: 20 15% 15%;
+  --muted-foreground: 40 10% 60%;
+  
+  --accent: 20 15% 15%;
+  --accent-foreground: 40 20% 95%;
+  
+  --success: 142 71% 45%;
+  --success-foreground: 0 0% 98%;
+  
+  --destructive: 12 76% 61%;
   --destructive-foreground: 0 0% 98%;
-  --border: 240 3.7% 15.9%;
-  --input: 240 3.7% 15.9%;
-  --ring: 240 4.9% 83.9%;
+  
+  --warning: 38 92% 50%;
+  --warning-foreground: 0 0% 10%;
+  
+  --border: 20 15% 20%;
+  --input: 20 15% 20%;
+  --ring: 149 50% 40%;
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-dm-serif), Georgia, serif;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+  
+  code, pre {
+    font-family: var(--font-jetbrains), 'Courier New', monospace;
+  }
+}
+
+@layer utilities {
+  /* Gradient utilities */
+  .bg-gradient-warm {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent-amber)) 100%);
+  }
+  
+  .bg-gradient-subtle {
+    background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--sage)) 100%);
+  }
+  
+  /* Animation utilities */
+  .animate-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .animate-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px -10px hsl(var(--primary) / 0.15);
+  }
+  
+  .animate-glow {
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .animate-glow:hover {
+    box-shadow: 0 0 20px hsl(var(--accent-amber) / 0.3);
+  }
+  
+  /* Text gradient */
+  .text-gradient-warm {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent-amber)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 }

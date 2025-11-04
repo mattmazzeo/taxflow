@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,8 +14,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { createClient } from "@/lib/supabase/client";
+import { Logo } from "@/components/brand/logo";
 import {
-  FileText,
   LayoutDashboard,
   Upload,
   CheckSquare,
@@ -51,9 +52,8 @@ export function DashboardNav({ user }: DashboardNavProps) {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-8">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <FileText className="h-6 w-6" />
-            <span className="text-xl font-bold">TaxFlow</span>
+          <Link href="/dashboard">
+            <Logo />
           </Link>
 
           <nav className="hidden md:flex items-center space-x-1">

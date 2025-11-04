@@ -6,7 +6,14 @@ import { Badge } from "@/components/ui/badge";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FileText, Brain, CheckSquare, Mail, Upload, Zap } from "lucide-react";
+import { CheckCircle2, Upload, Brain, Mail, FileCheck, Shield } from "lucide-react";
+import { Logo } from "@/components/brand/logo";
+import { HeroRelaxedIllustration } from "@/components/illustrations/hero-relaxed";
+import { Testimonials } from "@/components/landing/testimonials";
+import { StatsTicker } from "@/components/landing/stats-ticker";
+import { HowItWorks } from "@/components/landing/how-it-works";
+import { SecurityBadges } from "@/components/trust/security-badge";
+import { GuaranteeBanner } from "@/components/trust/guarantee-banner";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -52,109 +59,140 @@ export default function Home() {
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-2">
-            <FileText className="h-6 w-6" />
-            <span className="text-xl font-bold">TaxFlow</span>
-          </div>
-          <Button variant="outline" onClick={() => router.push("#pricing")}>
+          <Logo />
+          <Button variant="outline" onClick={() => router.push("#signup")}>
             Sign In
           </Button>
         </div>
       </header>
 
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="container flex flex-col items-center gap-8 py-20 text-center lg:py-32">
-          <Badge variant="secondary" className="px-4 py-1">
-            AI-Powered Tax Document Management
-          </Badge>
-          <h1 className="max-w-4xl text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-            Never miss a tax document again
-          </h1>
-          <p className="max-w-2xl text-lg text-muted-foreground sm:text-xl">
-            TaxFlow uses AI to organize your W-2s, 1099s, and receipts. Get smart checklists,
-            automated reminders, and export everything for your CPA.
-          </p>
-          <div className="flex flex-col gap-4 sm:flex-row">
-            <Button size="lg" onClick={() => router.push("#pricing")}>
-              Get Started Free
+        {/* Hero Section - Empathy First */}
+        <section className="container flex flex-col items-center gap-12 py-16 text-center lg:py-24">
+          <div className="space-y-6">
+            <h1 className="max-w-4xl text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
+              Tax season doesn't have to feel like{" "}
+              <span className="text-gradient-warm">tax season</span>
+            </h1>
+            <p className="mx-auto max-w-2xl text-lg text-muted-foreground sm:text-xl">
+              We help you stay organized, feel confident, and stop worrying about missing forms.
+            </p>
+          </div>
+
+          {/* Hero Illustration */}
+          <div className="w-full max-w-2xl">
+            <HeroRelaxedIllustration className="h-auto w-full" />
+          </div>
+
+          {/* CTA */}
+          <div className="flex flex-col items-center gap-6">
+            <Button size="lg" className="text-lg px-8 py-6 animate-lift" onClick={() => router.push("#signup")}>
+              Start organizing for free
             </Button>
-            <Button size="lg" variant="outline">
-              Watch Demo
-            </Button>
+            <StatsTicker />
           </div>
         </section>
 
-        {/* Features Section */}
+        {/* Social Proof Section */}
+        <section className="border-t bg-gradient-subtle py-20">
+          <div className="container">
+            <div className="mb-12 text-center">
+              <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
+                Join thousands who stopped stressing about taxes
+              </h2>
+              <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+                Real people, real peace of mind
+              </p>
+            </div>
+            <Testimonials />
+            <div className="mt-12 flex justify-center">
+              <SecurityBadges />
+            </div>
+          </div>
+        </section>
+
+        {/* How It Works - Story Flow */}
+        <section className="container py-20">
+          <div className="mb-16 text-center">
+            <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
+              Four simple steps to tax peace of mind
+            </h2>
+            <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+              From chaos to organized in minutes, not hours
+            </p>
+          </div>
+          <HowItWorks />
+        </section>
+
+        {/* Features Section - Benefit-First */}
         <section className="border-t bg-muted/40 py-20">
           <div className="container">
             <div className="mb-12 text-center">
               <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
-                Everything you need for tax season
+                Everything you need to feel confident
               </h2>
               <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-                From document ingestion to CPA export, TaxFlow handles it all.
+                Built for real people, not accountants
               </p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              <Card>
+              <Card className="animate-lift">
                 <CardHeader>
                   <Upload className="mb-2 h-8 w-8 text-primary" />
-                  <CardTitle>Smart Upload</CardTitle>
+                  <CardTitle>Your documents, instantly understood</CardTitle>
                   <CardDescription>
-                    Drag and drop PDFs or connect Gmail/Drive to automatically find tax documents.
+                    Just drag and drop. Our AI knows a W-2 from a 1099, automatically extracting what matters.
                   </CardDescription>
                 </CardHeader>
               </Card>
 
-              <Card>
+              <Card className="animate-lift">
                 <CardHeader>
                   <Brain className="mb-2 h-8 w-8 text-primary" />
-                  <CardTitle>AI Extraction</CardTitle>
+                  <CardTitle>Never wonder what's missing</CardTitle>
                   <CardDescription>
-                    Automatically detect document types and extract key fields like EIN, amounts, and
-                    withholdings.
+                    Smart checklists based on your last year's documents. See exactly what you have and what you still need.
                   </CardDescription>
                 </CardHeader>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CheckSquare className="mb-2 h-8 w-8 text-primary" />
-                  <CardTitle>Smart Checklists</CardTitle>
-                  <CardDescription>
-                    Get personalized checklists based on last year's documents. Never forget a form.
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-
-              <Card>
+              <Card className="animate-lift">
                 <CardHeader>
                   <Mail className="mb-2 h-8 w-8 text-primary" />
-                  <CardTitle>Email Nudges</CardTitle>
+                  <CardTitle>Gentle reminders that actually work</CardTitle>
                   <CardDescription>
-                    Weekly reminders during tax season with links to missing documents.
+                    Weekly nudges during tax season with helpful context. We remind you, we don't stress you out.
                   </CardDescription>
                 </CardHeader>
               </Card>
 
-              <Card>
+              <Card className="animate-lift">
                 <CardHeader>
-                  <Zap className="mb-2 h-8 w-8 text-primary" />
-                  <CardTitle>One-Click Export</CardTitle>
+                  <FileCheck className="mb-2 h-8 w-8 text-primary" />
+                  <CardTitle>Hand it off like a pro</CardTitle>
                   <CardDescription>
-                    Export everything as a ZIP with CSVs and original files for your accountant.
+                    Export everything your CPA needs in one organized package. They'll love you for it.
                   </CardDescription>
                 </CardHeader>
               </Card>
 
-              <Card>
+              <Card className="animate-lift">
                 <CardHeader>
-                  <FileText className="mb-2 h-8 w-8 text-primary" />
-                  <CardTitle>Secure Storage</CardTitle>
+                  <Shield className="mb-2 h-8 w-8 text-primary" />
+                  <CardTitle>Bank-level security for your peace of mind</CardTitle>
                   <CardDescription>
-                    Bank-level encryption with Supabase. Your sensitive tax data stays private.
+                    Your sensitive tax data stays private with enterprise-grade encryption. We never sell your data.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
+              <Card className="animate-lift">
+                <CardHeader>
+                  <CheckCircle2 className="mb-2 h-8 w-8 text-success" />
+                  <CardTitle>Set it and relax</CardTitle>
+                  <CardDescription>
+                    Connect Gmail or Drive once, and we'll automatically find tax documents as they arrive. Zero effort.
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -162,148 +200,165 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Pricing Section */}
+        {/* Pricing Section - Value Positioning */}
         <section id="pricing" className="container py-20">
           <div className="mb-12 text-center">
             <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
-              Simple, transparent pricing
+              Choose your level of confidence
             </h2>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-              Start free, upgrade as you need more features.
+              Start free, upgrade when you're ready for more peace of mind
             </p>
+            <div className="mt-6 flex justify-center">
+              <GuaranteeBanner />
+            </div>
           </div>
 
           <div className="grid gap-8 md:grid-cols-3">
             {/* Free Plan */}
-            <Card>
+            <Card className="relative animate-lift">
               <CardHeader>
-                <CardTitle>Free</CardTitle>
-                <CardDescription>Perfect for getting started</CardDescription>
+                <CardTitle className="text-2xl">Start with peace of mind</CardTitle>
+                <CardDescription className="text-base">Just getting organized</CardDescription>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">$0</span>
+                  <span className="text-5xl font-bold">$0</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
+                <p className="text-sm text-muted-foreground italic">Free forever. No credit card needed.</p>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-center gap-2">
-                    <CheckSquare className="h-4 w-4 text-primary" />1 household
+                <ul className="space-y-3 text-sm mb-6">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>1 household, 1 active tax year</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <CheckSquare className="h-4 w-4 text-primary" />1 active tax year
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Up to 10 documents with AI extraction</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <CheckSquare className="h-4 w-4 text-primary" />Up to 10 documents
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Basic checklist and manual upload</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <CheckSquare className="h-4 w-4 text-primary" />Manual upload only
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Export package for your CPA</span>
                   </li>
                 </ul>
-                <Button className="mt-6 w-full" variant="outline" onClick={() => router.push("#signup")}>
-                  Get Started
+                <Button className="w-full" variant="outline" onClick={() => router.push("#signup")}>
+                  Get Started Free
                 </Button>
               </CardContent>
             </Card>
 
             {/* Basic Plan */}
-            <Card className="border-primary">
+            <Card className="relative border-2 border-primary shadow-lg animate-lift scale-105">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                <Badge className="bg-warning text-warning-foreground px-4 py-1 text-sm font-semibold">
+                  Most Popular
+                </Badge>
+              </div>
               <CardHeader>
-                <Badge className="w-fit">Most Popular</Badge>
-                <CardTitle>Basic</CardTitle>
-                <CardDescription>For individuals and families</CardDescription>
+                <CardTitle className="text-2xl">Stay confident all year</CardTitle>
+                <CardDescription className="text-base">Families who want to stop worrying</CardDescription>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">$9</span>
+                  <span className="text-5xl font-bold">$9</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
+                <p className="text-sm text-success font-medium">Most popular for peace of mind</p>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-center gap-2">
-                    <CheckSquare className="h-4 w-4 text-primary" />2 active tax years
+                <ul className="space-y-3 text-sm mb-6">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>2 active tax years</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <CheckSquare className="h-4 w-4 text-primary" />Up to 100 documents
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Up to 100 documents per year</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <CheckSquare className="h-4 w-4 text-primary" />Gmail & Drive ingest
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span><strong>Automatic imports</strong> from Gmail & Drive</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <CheckSquare className="h-4 w-4 text-primary" />Weekly email nudges
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span><strong>Weekly email reminders</strong> during tax season</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Smart checklist that learns your situation</span>
                   </li>
                 </ul>
-                <Button className="mt-6 w-full" onClick={() => router.push("#signup")}>
+                <Button className="w-full" onClick={() => router.push("#signup")}>
                   Start Free Trial
                 </Button>
               </CardContent>
             </Card>
 
             {/* Pro Plan */}
-            <Card>
+            <Card className="relative animate-lift">
               <CardHeader>
-                <CardTitle>Pro</CardTitle>
-                <CardDescription>For power users and businesses</CardDescription>
+                <CardTitle className="text-2xl">Work with your CPA like a pro</CardTitle>
+                <CardDescription className="text-base">Complex taxes or small business</CardDescription>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">$19</span>
+                  <span className="text-5xl font-bold">$19</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
+                <p className="text-sm text-muted-foreground italic">For maximum confidence</p>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-center gap-2">
-                    <CheckSquare className="h-4 w-4 text-primary" />Unlimited tax years
+                <ul className="space-y-3 text-sm mb-6">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Unlimited tax years</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <CheckSquare className="h-4 w-4 text-primary" />Up to 1000 documents
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Up to 1,000 documents per year</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <CheckSquare className="h-4 w-4 text-primary" />Priority AI parsing
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span><strong>Priority AI parsing</strong> (faster processing)</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <CheckSquare className="h-4 w-4 text-primary" />Export package for CPA
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span><strong>CPA-ready export packages</strong> with summaries</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span><strong>Priority email support</strong></span>
                   </li>
                 </ul>
-                <Button className="mt-6 w-full" variant="outline" onClick={() => router.push("#signup")}>
-                  Get Started
+                <Button className="w-full" variant="outline" onClick={() => router.push("#signup")}>
+                  Start Free Trial
                 </Button>
               </CardContent>
             </Card>
           </div>
+
+          <p className="mt-12 text-center text-sm text-muted-foreground">
+            All plans include bank-level encryption, secure storage, and we never sell your data.
+          </p>
         </section>
 
-        {/* Sign Up Section */}
-        <section id="signup" className="border-t bg-muted/40 py-20">
+        {/* Sign Up Section - Trust First */}
+        <section id="signup" className="border-t bg-gradient-subtle py-20">
           <div className="container max-w-xl text-center">
-            <h2 className="mb-4 text-3xl font-bold">Ready to get organized?</h2>
-            <p className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-3xl font-bold">Join 2,500+ people who stopped stressing about taxes</h2>
+            <p className="mb-4 text-muted-foreground">
               Sign in with email or Google to start managing your tax documents.
             </p>
+            <div className="mb-8 flex flex-col items-center gap-2">
+              <SecurityBadges className="scale-90" />
+              <p className="text-xs text-muted-foreground">
+                We never sell your data. Bank-level encryption keeps your information secure.
+              </p>
+            </div>
 
             <div className="space-y-4">
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  placeholder="your@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  onKeyDown={(e) => e.key === "Enter" && handleSignIn()}
-                />
-                <Button onClick={handleSignIn} disabled={loading || !email}>
-                  {loading ? "Sending..." : "Send Magic Link"}
-                </Button>
-              </div>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-muted/40 px-2 text-muted-foreground">Or</span>
-                </div>
-              </div>
-
-              <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
-                <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+              <Button variant="outline" className="w-full h-12 text-base" onClick={handleGoogleSignIn}>
+                <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
                   <path
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                     fill="#4285F4"
@@ -323,6 +378,32 @@ export default function Home() {
                 </svg>
                 Continue with Google
               </Button>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-gradient-subtle px-2 text-muted-foreground">Or</span>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="flex h-12 w-full rounded-md border border-input bg-background px-4 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  onKeyDown={(e) => e.key === "Enter" && handleSignIn()}
+                />
+                <Button onClick={handleSignIn} disabled={loading || !email} className="h-12 px-6">
+                  {loading ? "Sending..." : "Send Link"}
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                ✨ No password to remember - we'll email you a magic link
+              </p>
             </div>
 
             <p className="mt-8 text-xs text-muted-foreground">
@@ -332,16 +413,51 @@ export default function Home() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t py-8">
-        <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
-          <div className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
-            <span className="font-semibold">TaxFlow</span>
+      {/* Footer - Enhanced */}
+      <footer className="border-t py-12 bg-muted/20">
+        <div className="container">
+          <div className="grid gap-8 md:grid-cols-4">
+            <div className="space-y-4">
+              <Logo />
+              <p className="text-sm text-muted-foreground">
+                Tax season doesn't have to feel like tax season.
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold mb-3">Product</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#pricing" className="hover:text-primary transition-colors">Pricing</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Features</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">FAQ</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold mb-3">Trust & Security</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-primary transition-colors">Security</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Terms of Service</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold mb-3">Support</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-primary transition-colors">Help Center</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Contact Us</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">For CPAs</a></li>
+              </ul>
+            </div>
           </div>
-          <p className="text-center text-sm text-muted-foreground">
-            © 2025 TaxFlow. Built with Next.js, Supabase, and OpenAI.
-          </p>
+          
+          <div className="mt-12 pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-muted-foreground">
+              © 2025 TaxFlow. Built with care for people who dread tax season.
+            </p>
+            <SecurityBadges className="scale-75" />
+          </div>
         </div>
       </footer>
     </div>
