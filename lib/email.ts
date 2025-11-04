@@ -1,12 +1,15 @@
 import { Resend } from "resend";
 
-if (!process.env.RESEND_API_KEY) {
-  console.warn("RESEND_API_KEY is not configured. Email sending will fail.");
-}
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "noreply@taxflow.app";
+
+// Lazy-load Resend client to avoid build-time errors
+let resendClient: Resend | null = null;
+function getResendClient(): Resend | null {
+  if (!resendClient && process.env.RESEND_API_KEY) {
+    resendClient = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resendClient;
+}
 
 interface NudgeEmailParams {
   to: string;
@@ -26,6 +29,13 @@ export async function sendNudgeEmail({
   taxYear,
   dashboardUrl,
 }: NudgeEmailParams): Promise<{ success: boolean; error?: string }> {
+  const resend = getResendClient();
+  
+  if (!resend) {
+    console.warn("Resend not configured. Email not sent.");
+    return { success: false, error: "Email service not configured" };
+  }
+
   try {
     const itemsList = missingItems
       .map(
@@ -131,6 +141,13 @@ export async function sendWelcomeEmail(
   to: string,
   name: string
 ): Promise<{ success: boolean }> {
+  const resend = getResendClient();
+  
+  if (!resend) {
+    console.warn("Resend not configured. Welcome email not sent.");
+    return { success: false };
+  }
+
   try {
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
@@ -155,4 +172,3 @@ export async function sendWelcomeEmail(
     return { success: false };
   }
 }
-

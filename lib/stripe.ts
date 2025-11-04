@@ -1,13 +1,19 @@
 import Stripe from "stripe";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY is not defined");
+// Lazy-load Stripe client to avoid build-time errors
+let stripeClient: Stripe | null = null;
+function getStripeClient(): Stripe | null {
+  if (!stripeClient && process.env.STRIPE_SECRET_KEY) {
+    stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2024-11-20.acacia",
+      typescript: true,
+    });
+  }
+  return stripeClient;
 }
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2024-11-20.acacia",
-  typescript: true,
-});
+// Export stripe instance (may be null if not configured)
+export const stripe = getStripeClient();
 
 /**
  * Get or create a Stripe customer for a user
@@ -17,9 +23,12 @@ export async function getOrCreateStripeCustomer(
   email: string,
   name?: string
 ): Promise<string> {
-  // This would typically query Supabase to see if customer exists
-  // For now, create a new customer
-  const customer = await stripe.customers.create({
+  const client = getStripeClient();
+  if (!client) {
+    throw new Error("Stripe is not configured");
+  }
+
+  const customer = await client.customers.create({
     email,
     name: name || undefined,
     metadata: {
@@ -39,7 +48,12 @@ export async function createCheckoutSession(
   successUrl: string,
   cancelUrl: string
 ) {
-  const session = await stripe.checkout.sessions.create({
+  const client = getStripeClient();
+  if (!client) {
+    throw new Error("Stripe is not configured");
+  }
+
+  const session = await client.checkout.sessions.create({
     customer: customerId,
     mode: "subscription",
     payment_method_types: ["card"],
@@ -64,7 +78,12 @@ export async function createPortalSession(
   customerId: string,
   returnUrl: string
 ) {
-  const session = await stripe.billingPortal.sessions.create({
+  const client = getStripeClient();
+  if (!client) {
+    throw new Error("Stripe is not configured");
+  }
+
+  const session = await client.billingPortal.sessions.create({
     customer: customerId,
     return_url: returnUrl,
   });
@@ -76,15 +95,24 @@ export async function createPortalSession(
  * Get subscription details
  */
 export async function getSubscription(subscriptionId: string) {
-  return await stripe.subscriptions.retrieve(subscriptionId);
+  const client = getStripeClient();
+  if (!client) {
+    throw new Error("Stripe is not configured");
+  }
+
+  return await client.subscriptions.retrieve(subscriptionId);
 }
 
 /**
  * Cancel subscription
  */
 export async function cancelSubscription(subscriptionId: string) {
-  return await stripe.subscriptions.update(subscriptionId, {
+  const client = getStripeClient();
+  if (!client) {
+    throw new Error("Stripe is not configured");
+  }
+
+  return await client.subscriptions.update(subscriptionId, {
     cancel_at_period_end: true,
   });
 }
-
