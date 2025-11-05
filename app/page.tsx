@@ -124,7 +124,7 @@ export default function Home() {
             <button onClick={() => scrollToSection("pricing")} className="text-sm font-medium hover:text-primary transition-colors">
               Pricing
             </button>
-            <a href="#" className="text-sm font-medium hover:text-primary transition-colors">For CPAs</a>
+            <a href="/for-cpas" className="text-sm font-medium hover:text-primary transition-colors">For CPAs</a>
           </nav>
 
           <div className="flex items-center gap-4">
@@ -159,7 +159,7 @@ export default function Home() {
               <button onClick={() => scrollToSection("pricing")} className="block w-full text-left px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors">
                 Pricing
               </button>
-              <a href="#" className="block w-full text-left px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors">For CPAs</a>
+              <a href="/for-cpas" className="block w-full text-left px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors">For CPAs</a>
               <div className="pt-2 space-y-2">
                 <Button variant="outline" onClick={handleGoogleSignIn} className="w-full">Sign In</Button>
                 <Button onClick={() => scrollToSection("signup")} className="w-full">Get Started Free</Button>

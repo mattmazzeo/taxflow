@@ -45,7 +45,7 @@ const caseStudies = [
       { label: "Client satisfaction", value: "+45%" },
       { label: "Can serve more clients", value: "8 more/year" },
     ],
-    image: "https://images.unsplash.com/photo-1556157382-97eda2f9e2bf?w=800&h=600&fit=crop&crop=faces",
+    image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&h=600&fit=crop&crop=faces",
     quote: "I recommend TaxFlow to every client now. It's not just about saving me time—their organized documents mean they save on my billable hours too. Everyone wins.",
   },
 ];
