@@ -12,8 +12,8 @@ export function FounderStory({ className = "" }: { className?: string }) {
           {/* Image side */}
           <div className="relative md:col-span-2 h-80 md:h-auto">
             <Image
-              src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=800&fit=crop&crop=faces"
-              alt="Alex Mazzeo, TaxFlow Founder"
+              src="/matt-mazzeo-founder.JPG"
+              alt="Matt Mazzeo, TaxFlow Founder"
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 40vw"
@@ -51,7 +51,7 @@ export function FounderStory({ className = "" }: { className?: string }) {
             </div>
 
             <div className="pt-6 border-t">
-              <p className="font-semibold text-foreground">— Alex Mazzeo</p>
+              <p className="font-semibold text-foreground">— Matt Mazzeo</p>
               <p className="text-sm text-muted-foreground">Founder, TaxFlow</p>
               <p className="text-xs text-muted-foreground mt-1 italic">
                 Dad, former tax procrastinator, now slightly less stressed
