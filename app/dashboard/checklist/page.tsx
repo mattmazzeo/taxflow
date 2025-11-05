@@ -182,21 +182,59 @@ export default async function ChecklistPage() {
           })}
         </div>
       ) : (
-        <Card>
+        <Card className="border-primary/20">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="rounded-full bg-muted p-6 mb-4">
-              <CheckSquare className="h-12 w-12 text-muted-foreground" />
+            <div className="rounded-full bg-primary/10 p-6 mb-4">
+              <Sparkles className="h-12 w-12 text-primary" />
             </div>
-            <h3 className="text-2xl font-bold mb-2">No checklist items yet</h3>
-            <p className="text-muted-foreground max-w-md mb-6">
-              Upload documents from last year and we'll create a personalized checklist 
-              based on your tax situation. It only takes a minute!
+            <h3 className="text-3xl font-bold mb-3">Get Your Personalized Checklist</h3>
+            <p className="text-lg text-muted-foreground max-w-2xl mb-2">
+              <strong className="text-foreground">Here's how it works:</strong> Upload last year's tax return (your {currentYear - 1} return), 
+              and we'll instantly generate a personalized checklist of every document and piece of information you'll need for {currentYear}.
             </p>
+            <p className="text-muted-foreground max-w-xl mb-8">
+              No more guessing what you need. We analyze what you filed last year and tell you exactly what to collect this year.
+            </p>
+            <div className="bg-muted/50 rounded-lg p-6 mb-8 max-w-lg">
+              <div className="space-y-3 text-left">
+                <div className="flex items-start gap-3">
+                  <div className="rounded-full bg-primary/10 p-1.5 mt-0.5">
+                    <span className="text-lg">📄</span>
+                  </div>
+                  <div>
+                    <p className="font-medium">Upload your {currentYear - 1} tax return</p>
+                    <p className="text-sm text-muted-foreground">PDF of your last filed return</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="rounded-full bg-primary/10 p-1.5 mt-0.5">
+                    <span className="text-lg">🤖</span>
+                  </div>
+                  <div>
+                    <p className="font-medium">We analyze it with AI</p>
+                    <p className="text-sm text-muted-foreground">Extracts W-2s, 1099s, deductions, etc.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="rounded-full bg-primary/10 p-1.5 mt-0.5">
+                    <span className="text-lg">✅</span>
+                  </div>
+                  <div>
+                    <p className="font-medium">Get your {currentYear} checklist</p>
+                    <p className="text-sm text-muted-foreground">Personalized list of what you need</p>
+                  </div>
+                </div>
+              </div>
+            </div>
             <Link href="/dashboard/documents">
-              <Button size="lg" className="animate-lift">
-                Upload Documents
+              <Button size="lg" className="animate-lift text-base px-8">
+                <Upload className="mr-2 h-5 w-5" />
+                Upload {currentYear - 1} Tax Return
               </Button>
             </Link>
+            <p className="text-xs text-muted-foreground mt-4">
+              It only takes 30 seconds • We support PDFs, Gmail, and Google Drive
+            </p>
           </CardContent>
         </Card>
       )}
@@ -206,15 +244,16 @@ export default async function ChecklistPage() {
         <Card className="border-sage bg-sage/10">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Info className="h-5 w-5 text-sage-foreground" />
-              <CardTitle className="text-sage-foreground">Understanding your checklist</CardTitle>
+              <Sparkles className="h-5 w-5 text-sage-foreground" />
+              <CardTitle className="text-sage-foreground">About Your Personalized Checklist</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="text-sm text-sage-foreground space-y-2">
-            <p>• <strong>Generated from your history.</strong> This checklist is based on documents you've had in the past.</p>
-            <p>• <strong>Required items</strong> are marked as essential for your tax filing.</p>
-            <p>• <strong>Add custom items</strong> if you have new income sources or deductions this year.</p>
-            <p>• <strong>We'll remind you.</strong> Get gentle weekly nudges about what's still missing (if you're on Basic or Pro).</p>
+            <p>• <strong>Based on your {currentYear - 1} return.</strong> We analyzed last year's tax documents to identify every form, employer, bank, and deduction you'll need again for {currentYear}.</p>
+            <p>• <strong>Personalized to your situation.</strong> If you had a W-2 from Acme Corp last year, we remind you to get it again. Same with 1099s, mortgage interest statements, and more.</p>
+            <p>• <strong>Required vs. optional.</strong> Essential income documents are marked required. Deductions and credits are optional but can save you money.</p>
+            <p>• <strong>New this year?</strong> Add custom items if you have new employers, freelance clients, or life changes (marriage, home purchase, etc.)</p>
+            <p>• <strong>Weekly reminders.</strong> We'll send gentle nudges about outstanding items so nothing slips through the cracks (Basic/Pro plans).</p>
           </CardContent>
         </Card>
       )}

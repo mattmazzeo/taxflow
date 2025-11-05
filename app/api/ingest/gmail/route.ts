@@ -40,14 +40,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { taxYearId, year, query } = RequestSchema.parse(body);
 
-    // Search Gmail for tax documents (using stub)
+    // Search Gmail for tax documents (using real Gmail API)
     const messages = await searchGmailForTaxDocs(query, year);
 
     return NextResponse.json({
       success: true,
       messages,
-      isStub: true,
-      note: "This is using mock data. Connect real Gmail OAuth to see actual messages.",
+      count: messages.length,
     });
   } catch (error) {
     console.error("Gmail ingest error:", error);

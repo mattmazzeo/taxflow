@@ -427,11 +427,11 @@ export default function Home() {
             </Card>
 
             {/* Basic Plan - Most Popular */}
-            <Card className="relative border-2 border-primary shadow-premium-hover animate-lift scale-105 shadow-glow-amber">
+            <Card className="relative border-2 border-primary shadow-premium-hover animate-lift scale-105 bg-primary/5">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
-                <Badge className="bg-warning text-warning-foreground px-4 py-1 text-sm font-semibold shadow-premium">
-                  Most Popular
-                </Badge>
+                <div className="px-6 py-2 rounded-full text-sm font-bold shadow-premium-hover" style={{ backgroundColor: 'hsl(38, 92%, 50%)', color: 'hsl(0, 0%, 10%)' }}>
+                  ⭐ Most Popular
+                </div>
               </div>
               <CardHeader>
                 <CardTitle className="text-2xl">Stay confident all year</CardTitle>
@@ -465,7 +465,7 @@ export default function Home() {
                     <span>Smart checklist that learns your situation</span>
                   </li>
                 </ul>
-                <Button className="w-full animate-press shadow-premium" onClick={handleGoogleSignIn}>
+                <Button size="lg" className="w-full animate-press shadow-premium-hover text-base font-semibold h-14" onClick={handleGoogleSignIn}>
                   Get started free
                 </Button>
               </CardContent>
@@ -525,19 +525,19 @@ export default function Home() {
 
         {/* Sign Up Section - Trust First */}
         <section id="signup" className="border-t py-20">
-          <div className="container max-w-xl text-center">
+          <div className="container max-w-xl mx-auto text-center">
             <h2 className="mb-4 text-3xl font-bold">Join 2,500+ people who stopped stressing about taxes</h2>
             <p className="mb-4 text-muted-foreground">
               Sign in with email or Google to start managing your tax documents.
             </p>
-            <div className="mb-8 flex flex-col items-center gap-2">
+            <div className="mb-8 flex flex-col items-center justify-center gap-2">
               <SecurityBadges className="scale-90" />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground max-w-md">
                 We never sell your data. Bank-level encryption keeps your information secure.
               </p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 mx-auto max-w-md">
               <Button 
                 variant="outline" 
                 className="w-full h-12 text-base animate-press shadow-soft hover:shadow-premium transition-all" 
@@ -595,12 +595,12 @@ export default function Home() {
                   {loading ? "Sending..." : "Send Link"}
                 </Button>
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground text-center">
                 ✨ No password to remember - we'll email you a magic link
               </p>
             </div>
 
-            <p className="mt-8 text-xs text-muted-foreground">
+            <p className="mt-8 text-xs text-muted-foreground text-center max-w-md mx-auto">
               By signing up, you agree to our <a href="/terms" className="underline hover:text-foreground">Terms of Service</a> and <a href="/privacy" className="underline hover:text-foreground">Privacy Policy</a>.
             </p>
           </div>

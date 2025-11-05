@@ -40,14 +40,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { taxYearId, folderId, query } = RequestSchema.parse(body);
 
-    // List Drive files (using stub)
+    // List Drive files (using real Drive API)
     const files = await listDriveFiles(folderId, query);
 
     return NextResponse.json({
       success: true,
       files,
-      isStub: true,
-      note: "This is using mock data. Connect real Google Drive OAuth to see actual files.",
+      count: files.length,
     });
   } catch (error) {
     console.error("Drive ingest error:", error);

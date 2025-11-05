@@ -1,10 +1,12 @@
 /**
  * MCP (Model Context Protocol) Integration Layer
  * 
- * This module provides a thin adapter layer for Gmail and Google Drive MCP servers.
- * For MVP, these are functional stubs that return mock data structures.
- * The architecture allows swapping in real MCP calls with OAuth tokens later.
+ * This module provides integration with Gmail and Google Drive APIs
+ * using OAuth tokens from Supabase's Google authentication provider.
  */
+
+import { google } from "googleapis";
+import { createClient } from "@/lib/supabase/server";
 
 export interface GmailMessage {
   id: string;
@@ -30,181 +32,400 @@ export interface DriveFile {
 }
 
 /**
+ * Get Google OAuth2 client with tokens from Supabase session
+ */
+async function getGoogleAuth() {
+  const supabase = await createClient();
+  
+  // Get the current session
+  const { data: { session }, error } = await supabase.auth.getSession();
+  
+  if (error || !session) {
+    throw new Error("No active session found. Please sign in with Google.");
+  }
+
+  // Check if user signed in with Google OAuth
+  const providerToken = session.provider_token;
+  const providerRefreshToken = session.provider_refresh_token;
+
+  if (!providerToken) {
+    throw new Error(
+      "No Google OAuth tokens found. Please sign in with Google to access Gmail and Drive."
+    );
+  }
+
+  // Create OAuth2 client
+  const oauth2Client = new google.auth.OAuth2();
+  
+  // Set credentials
+  oauth2Client.setCredentials({
+    access_token: providerToken,
+    refresh_token: providerRefreshToken,
+  });
+
+  return oauth2Client;
+}
+
+/**
  * Search Gmail for tax-related messages
- * STUB: Returns mock data. Real implementation would use Gmail MCP server.
+ * Uses real Gmail API with OAuth tokens from Supabase session
  */
 export async function searchGmailForTaxDocs(
   query?: string,
   year?: number
 ): Promise<GmailMessage[]> {
-  // Mock data for development
-  const mockMessages: GmailMessage[] = [
-    {
-      id: "gmail_mock_1",
-      subject: "Your W-2 Form is Ready",
-      from: "payroll@acmecorp.com",
-      date: new Date("2024-01-25").toISOString(),
-      snippet: "Your W-2 form for tax year 2023 is now available...",
-      attachments: [
-        {
-          id: "att_1",
-          filename: "W2_2023_JohnDoe.pdf",
-          mimeType: "application/pdf",
-          size: 45230,
-        },
-      ],
-    },
-    {
-      id: "gmail_mock_2",
-      subject: "1099-NEC Form Available",
-      from: "noreply@freelanceplatform.com",
-      date: new Date("2024-01-30").toISOString(),
-      snippet: "Your 1099-NEC form is ready to download...",
-      attachments: [
-        {
-          id: "att_2",
-          filename: "1099-NEC_2023.pdf",
-          mimeType: "application/pdf",
-          size: 38912,
-        },
-      ],
-    },
-    {
-      id: "gmail_mock_3",
-      subject: "Mortgage Interest Statement (1098)",
-      from: "statements@bigbankmortgage.com",
-      date: new Date("2024-02-01").toISOString(),
-      snippet: "Your 2023 mortgage interest statement is attached...",
-      attachments: [
-        {
-          id: "att_3",
-          filename: "1098_MortgageInterest_2023.pdf",
-          mimeType: "application/pdf",
-          size: 52100,
-        },
-      ],
-    },
-  ];
+  try {
+    const auth = await getGoogleAuth();
+    const gmail = google.gmail({ version: "v1", auth });
 
-  console.log(
-    "[MCP STUB] searchGmailForTaxDocs called with query:",
-    query,
-    "year:",
-    year
-  );
+    // Build search query for tax-related emails
+    let searchQuery = query || "";
+    
+    // Add common tax document keywords if no specific query provided
+    if (!searchQuery) {
+      const taxKeywords = [
+        "W-2",
+        "W2",
+        "1099",
+        "1098",
+        "tax form",
+        "tax document",
+        "tax statement",
+        "K-1",
+      ];
+      searchQuery = taxKeywords.map((kw) => `"${kw}"`).join(" OR ");
+    }
 
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
+    // Add year filter if provided
+    if (year) {
+      searchQuery += ` after:${year}/01/01 before:${year}/12/31`;
+    }
 
-  return mockMessages;
+    // Add has:attachment filter to only get emails with attachments
+    searchQuery += " has:attachment";
+
+    console.log("[Gmail API] Searching with query:", searchQuery);
+
+    // Search for messages
+    const listResponse = await gmail.users.messages.list({
+      userId: "me",
+      q: searchQuery,
+      maxResults: 50, // Limit to 50 most recent
+    });
+
+    const messages = listResponse.data.messages || [];
+    
+    if (messages.length === 0) {
+      console.log("[Gmail API] No messages found");
+      return [];
+    }
+
+    console.log(`[Gmail API] Found ${messages.length} messages`);
+
+    // Fetch full details for each message
+    const gmailMessages: GmailMessage[] = [];
+
+    for (const message of messages) {
+      if (!message.id) continue;
+
+      const detailResponse = await gmail.users.messages.get({
+        userId: "me",
+        id: message.id,
+        format: "full",
+      });
+
+      const msgData = detailResponse.data;
+      const headers = msgData.payload?.headers || [];
+
+      // Extract headers
+      const subject =
+        headers.find((h) => h.name?.toLowerCase() === "subject")?.value || "(No Subject)";
+      const from =
+        headers.find((h) => h.name?.toLowerCase() === "from")?.value || "Unknown";
+      const date =
+        headers.find((h) => h.name?.toLowerCase() === "date")?.value ||
+        new Date().toISOString();
+
+      // Parse attachments
+      const attachments: GmailMessage["attachments"] = [];
+      
+      const parts = msgData.payload?.parts || [];
+      for (const part of parts) {
+        if (part.filename && part.body?.attachmentId) {
+          attachments.push({
+            id: part.body.attachmentId,
+            filename: part.filename,
+            mimeType: part.mimeType || "application/octet-stream",
+            size: part.body.size || 0,
+          });
+        }
+      }
+
+      // Also check nested parts (multipart messages)
+      const checkNestedParts = (parts: any[]): void => {
+        for (const part of parts) {
+          if (part.filename && part.body?.attachmentId) {
+            attachments.push({
+              id: part.body.attachmentId,
+              filename: part.filename,
+              mimeType: part.mimeType || "application/octet-stream",
+              size: part.body.size || 0,
+            });
+          }
+          if (part.parts) {
+            checkNestedParts(part.parts);
+          }
+        }
+      };
+
+      if (msgData.payload?.parts) {
+        checkNestedParts(msgData.payload.parts);
+      }
+
+      gmailMessages.push({
+        id: msgData.id!,
+        subject,
+        from,
+        date: new Date(date).toISOString(),
+        snippet: msgData.snippet || "",
+        attachments,
+      });
+    }
+
+    console.log(`[Gmail API] Parsed ${gmailMessages.length} messages with attachments`);
+    return gmailMessages;
+  } catch (error) {
+    console.error("[Gmail API] Error searching messages:", error);
+    throw new Error(
+      `Failed to search Gmail: ${error instanceof Error ? error.message : "Unknown error"}`
+    );
+  }
 }
 
 /**
  * Fetch Gmail attachment
- * STUB: Returns null. Real implementation would download attachment.
+ * Downloads attachment from Gmail using real Gmail API
  */
 export async function fetchGmailAttachment(
   messageId: string,
   attachmentId: string
 ): Promise<Buffer | null> {
-  console.log(
-    "[MCP STUB] fetchGmailAttachment called for message:",
-    messageId,
-    "attachment:",
-    attachmentId
-  );
+  try {
+    const auth = await getGoogleAuth();
+    const gmail = google.gmail({ version: "v1", auth });
 
-  // In real implementation, this would:
-  // 1. Call Gmail MCP server to download attachment
-  // 2. Return the file buffer
-  
-  // For now, return null
-  return null;
+    console.log(
+      `[Gmail API] Fetching attachment ${attachmentId} from message ${messageId}`
+    );
+
+    const attachment = await gmail.users.messages.attachments.get({
+      userId: "me",
+      messageId,
+      id: attachmentId,
+    });
+
+    if (!attachment.data.data) {
+      console.error("[Gmail API] No attachment data returned");
+      return null;
+    }
+
+    // Gmail returns base64url encoded data, convert to Buffer
+    // base64url uses - and _ instead of + and /
+    const base64Data = attachment.data.data
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+
+    const buffer = Buffer.from(base64Data, "base64");
+
+    console.log(
+      `[Gmail API] Successfully fetched attachment (${buffer.length} bytes)`
+    );
+
+    return buffer;
+  } catch (error) {
+    console.error("[Gmail API] Error fetching attachment:", error);
+    throw new Error(
+      `Failed to fetch Gmail attachment: ${error instanceof Error ? error.message : "Unknown error"}`
+    );
+  }
 }
 
 /**
  * List files in Google Drive folder
- * STUB: Returns mock data. Real implementation would use Drive MCP server.
+ * Uses real Google Drive API with OAuth tokens from Supabase session
  */
 export async function listDriveFiles(
   folderId?: string,
   query?: string
 ): Promise<DriveFile[]> {
-  // Mock data for development
-  const mockFiles: DriveFile[] = [
-    {
-      id: "drive_mock_1",
-      name: "Tax Documents 2023",
-      mimeType: "application/vnd.google-apps.folder",
-      size: 0,
-      modifiedTime: new Date("2023-12-15").toISOString(),
-    },
-    {
-      id: "drive_mock_2",
-      name: "W2_Acme_2023.pdf",
-      mimeType: "application/pdf",
-      size: 47850,
-      modifiedTime: new Date("2024-01-20").toISOString(),
-      webViewLink: "https://drive.google.com/file/d/mock_2/view",
-    },
-    {
-      id: "drive_mock_3",
-      name: "Receipts_Q4_2023.pdf",
-      mimeType: "application/pdf",
-      size: 125600,
-      modifiedTime: new Date("2024-01-05").toISOString(),
-      webViewLink: "https://drive.google.com/file/d/mock_3/view",
-    },
-    {
-      id: "drive_mock_4",
-      name: "Charitable_Donations_2023.xlsx",
-      mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      size: 23400,
-      modifiedTime: new Date("2023-12-31").toISOString(),
-      webViewLink: "https://drive.google.com/file/d/mock_4/view",
-    },
-  ];
+  try {
+    const auth = await getGoogleAuth();
+    const drive = google.drive({ version: "v3", auth });
 
-  console.log(
-    "[MCP STUB] listDriveFiles called with folderId:",
-    folderId,
-    "query:",
-    query
-  );
+    // Build search query
+    let searchQuery = "";
 
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
+    // Filter by folder if specified
+    if (folderId) {
+      searchQuery += `'${folderId}' in parents`;
+    }
 
-  return mockFiles;
+    // Add custom query if provided
+    if (query) {
+      if (searchQuery) searchQuery += " and ";
+      searchQuery += `(name contains '${query}' or fullText contains '${query}')`;
+    } else {
+      // Default: search for tax-related files
+      const taxKeywords = [
+        "W-2",
+        "W2",
+        "1099",
+        "1098",
+        "tax",
+        "receipt",
+        "invoice",
+        "K-1",
+      ];
+      const nameQueries = taxKeywords
+        .map((kw) => `name contains '${kw}'`)
+        .join(" or ");
+      
+      if (searchQuery) searchQuery += " and ";
+      searchQuery += `(${nameQueries})`;
+    }
+
+    // Exclude trashed files
+    searchQuery += " and trashed = false";
+
+    console.log("[Drive API] Searching with query:", searchQuery);
+
+    // List files
+    const response = await drive.files.list({
+      q: searchQuery,
+      fields:
+        "files(id, name, mimeType, size, modifiedTime, webViewLink, webContentLink)",
+      pageSize: 100, // Max 100 files
+      orderBy: "modifiedTime desc",
+    });
+
+    const files = response.data.files || [];
+
+    console.log(`[Drive API] Found ${files.length} files`);
+
+    const driveFiles: DriveFile[] = files.map((file) => ({
+      id: file.id!,
+      name: file.name || "Untitled",
+      mimeType: file.mimeType || "application/octet-stream",
+      size: parseInt(file.size || "0", 10),
+      modifiedTime: file.modifiedTime || new Date().toISOString(),
+      webViewLink: file.webViewLink || undefined,
+    }));
+
+    return driveFiles;
+  } catch (error) {
+    console.error("[Drive API] Error listing files:", error);
+    throw new Error(
+      `Failed to list Drive files: ${error instanceof Error ? error.message : "Unknown error"}`
+    );
+  }
 }
 
 /**
  * Download file from Google Drive
- * STUB: Returns null. Real implementation would download file.
+ * Uses real Google Drive API to download file content
  */
 export async function downloadDriveFile(
   fileId: string
 ): Promise<Buffer | null> {
-  console.log("[MCP STUB] downloadDriveFile called for file:", fileId);
+  try {
+    const auth = await getGoogleAuth();
+    const drive = google.drive({ version: "v3", auth });
 
-  // In real implementation, this would:
-  // 1. Call Drive MCP server to download file
-  // 2. Return the file buffer
-  
-  // For now, return null
-  return null;
+    console.log(`[Drive API] Downloading file ${fileId}`);
+
+    // First, get file metadata to determine if it's a Google Workspace file
+    const metadata = await drive.files.get({
+      fileId,
+      fields: "mimeType, name",
+    });
+
+    const mimeType = metadata.data.mimeType;
+    const fileName = metadata.data.name;
+
+    console.log(
+      `[Drive API] File: ${fileName}, MIME type: ${mimeType}`
+    );
+
+    // Handle Google Workspace files (Docs, Sheets, Slides) - export as PDF
+    if (mimeType?.startsWith("application/vnd.google-apps.")) {
+      console.log("[Drive API] Exporting Google Workspace file as PDF");
+      
+      const response = await drive.files.export(
+        {
+          fileId,
+          mimeType: "application/pdf",
+        },
+        {
+          responseType: "arraybuffer",
+        }
+      );
+
+      const buffer = Buffer.from(response.data as ArrayBuffer);
+      console.log(
+        `[Drive API] Successfully exported file (${buffer.length} bytes)`
+      );
+      return buffer;
+    } else {
+      // Regular file - download directly
+      const response = await drive.files.get(
+        {
+          fileId,
+          alt: "media",
+        },
+        {
+          responseType: "arraybuffer",
+        }
+      );
+
+      const buffer = Buffer.from(response.data as ArrayBuffer);
+      console.log(
+        `[Drive API] Successfully downloaded file (${buffer.length} bytes)`
+      );
+      return buffer;
+    }
+  } catch (error) {
+    console.error("[Drive API] Error downloading file:", error);
+    throw new Error(
+      `Failed to download Drive file: ${error instanceof Error ? error.message : "Unknown error"}`
+    );
+  }
 }
 
 /**
  * Check if MCP integrations are configured
+ * Checks if user has authenticated with Google OAuth
  */
-export function isMCPConfigured(): {
+export async function isMCPConfigured(): Promise<{
   gmail: boolean;
   drive: boolean;
-} {
-  return {
-    gmail: false, // Would check for MCP_GMAIL_CREDENTIALS_JSON_BASE64
-    drive: false, // Would check for MCP_GOOGLE_DRIVE_CREDENTIALS_JSON_BASE64
-  };
+}> {
+  try {
+    const supabase = await createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+
+    // Check if user has Google OAuth provider tokens
+    const hasGoogleAuth = !!(session?.provider_token);
+
+    return {
+      gmail: hasGoogleAuth,
+      drive: hasGoogleAuth,
+    };
+  } catch (error) {
+    console.error("[MCP] Error checking configuration:", error);
+    return {
+      gmail: false,
+      drive: false,
+    };
+  }
 }
 

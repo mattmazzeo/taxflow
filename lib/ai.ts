@@ -196,6 +196,11 @@ Confidence scores (0-100):
 Extract all relevant fields you can identify with confidence > 50.`;
 
   try {
+    const openai = getOpenAIClient();
+    if (!openai) {
+      throw new Error("OpenAI client not configured");
+    }
+
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
