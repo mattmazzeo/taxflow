@@ -17,7 +17,7 @@ const caseStudies = [
       { label: "Documents found", value: "15 1099s" },
       { label: "Hidden forms discovered", value: "2 forms" },
     ],
-    image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=800&h=600&fit=crop&crop=faces",
+    image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e",
     quote: "I thought I had everything. TaxFlow found two 1099s I completely forgot about. That's income I would have missed reporting!",
   },
   {
@@ -31,7 +31,7 @@ const caseStudies = [
       { label: "Filed early by", value: "2 weeks" },
       { label: "Stress level", value: "Near zero" },
     ],
-    image: "https://images.unsplash.com/photo-1511895426328-dc8714191300?w=800&h=600&fit=crop&crop=center",
+    image: "https://images.unsplash.com/photo-1511895426328-dc8714191300",
     quote: "We went from panicking about our first homeowner taxes to being the first in our friend group to file. TaxFlow made us look like we had it together!",
   },
   {
@@ -45,7 +45,7 @@ const caseStudies = [
       { label: "Client satisfaction", value: "+45%" },
       { label: "Can serve more clients", value: "8 more/year" },
     ],
-    image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&h=600&fit=crop&crop=faces",
+    image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf",
     quote: "I recommend TaxFlow to every client now. It's not just about saving me time—their organized documents mean they save on my billable hours too. Everyone wins.",
   },
 ];

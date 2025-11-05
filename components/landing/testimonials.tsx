@@ -13,7 +13,7 @@ const testimonials = [
     role: "Small Business Owner",
     outcome: "Saved 6 hours",
     rating: 5,
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=faces",
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
     linkedin: true,
   },
   {
@@ -22,7 +22,7 @@ const testimonials = [
     role: "Tax Professional at Roberts & Associates",
     outcome: "Saves 2 hours per client",
     rating: 5,
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=faces",
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
     linkedin: true,
   },
   {
@@ -31,7 +31,7 @@ const testimonials = [
     role: "Working Parent & First-Time Homebuyer",
     outcome: "Found $800 in deductions",
     rating: 5,
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=faces",
+    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
     linkedin: false,
   },
   {
@@ -40,7 +40,7 @@ const testimonials = [
     role: "Freelance Designer",
     outcome: "Organized 15 1099s effortlessly",
     rating: 5,
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces",
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
     linkedin: true,
   },
   {
@@ -49,7 +49,7 @@ const testimonials = [
     role: "Parents & Real Estate Investors",
     outcome: "Filed 2 weeks early",
     rating: 5,
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop&crop=faces",
+    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2",
     linkedin: false,
   },
   {
@@ -58,7 +58,7 @@ const testimonials = [
     role: "Software Engineer",
     outcome: "Eliminated manual data entry",
     rating: 5,
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
     linkedin: true,
   },
 ];
