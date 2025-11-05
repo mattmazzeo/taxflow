@@ -3,10 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { CheckCircle2, Upload, Brain, Mail, FileCheck, Shield } from "lucide-react";
+import { CheckCircle2, Upload, Brain, Mail, FileCheck, Shield, Menu, X } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { HeroRelaxedIllustration } from "@/components/illustrations/hero-relaxed";
 import { Testimonials } from "@/components/landing/testimonials";
@@ -14,15 +15,50 @@ import { StatsTicker } from "@/components/landing/stats-ticker";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { SecurityBadges } from "@/components/trust/security-badge";
 import { GuaranteeBanner } from "@/components/trust/guarantee-banner";
+import { VideoDemoModal, VideoPlayButton } from "@/components/landing/video-demo-modal";
+import { CaseStudies } from "@/components/landing/case-studies";
+import { WhyTaxFlow } from "@/components/landing/why-taxflow";
+import { PricingFAQ } from "@/components/landing/pricing-faq";
+import { FounderStory } from "@/components/landing/founder-story";
+import { EarlyAccess } from "@/components/landing/early-access";
+import { ExitIntentModal, useExitIntent } from "@/components/landing/exit-intent";
+import { toast } from "sonner";
 
 export default function Home() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showVideoModal, setShowVideoModal] = useState(false);
+  const [showExitIntent, setShowExitIntent] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showScrollCTA, setShowScrollCTA] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
+  // Exit intent detection
+  useExitIntent(() => {
+    // Only show once per session
+    if (!sessionStorage.getItem("exitIntentShown")) {
+      setShowExitIntent(true);
+      sessionStorage.setItem("exitIntentShown", "true");
+    }
+  });
+
+  // Handle scroll for sticky CTA
+  useState(() => {
+    const handleScroll = () => {
+      setShowScrollCTA(window.scrollY > 600);
+    };
+    if (typeof window !== "undefined") {
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    }
+  });
+
   const handleSignIn = async () => {
-    if (!email) return;
+    if (!email) {
+      toast.error("Please enter your email address");
+      return;
+    }
     setLoading(true);
     
     const { error } = await supabase.auth.signInWithOtp({
@@ -34,9 +70,12 @@ export default function Home() {
 
     if (error) {
       console.error("Error sending magic link:", error);
-      alert("Error sending magic link. Please try again.");
+      toast.error("Error sending magic link. Please try again.");
     } else {
-      alert("Check your email for the magic link!");
+      toast.success("Check your email! 📧", {
+        description: "We sent you a magic link to sign in.",
+      });
+      setEmail("");
     }
     setLoading(false);
   };
@@ -51,45 +90,168 @@ export default function Home() {
 
     if (error) {
       console.error("Error signing in with Google:", error);
+      toast.error("Error signing in with Google. Please try again.");
+    }
+  };
+
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+      setMobileMenuOpen(false);
     }
   };
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      {/* Header */}
+      {/* Modals */}
+      <VideoDemoModal isOpen={showVideoModal} onClose={() => setShowVideoModal(false)} />
+      <ExitIntentModal isOpen={showExitIntent} onClose={() => setShowExitIntent(false)} />
+
+      {/* Header with Full Navigation */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
           <Logo />
-          <Button variant="outline" onClick={() => router.push("#signup")}>
-            Sign In
-          </Button>
+          
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-8">
+            <button onClick={() => scrollToSection("features")} className="text-sm font-medium hover:text-primary transition-colors">
+              Features
+            </button>
+            <button onClick={() => scrollToSection("how-it-works")} className="text-sm font-medium hover:text-primary transition-colors">
+              How It Works
+            </button>
+            <button onClick={() => scrollToSection("pricing")} className="text-sm font-medium hover:text-primary transition-colors">
+              Pricing
+            </button>
+            <a href="#" className="text-sm font-medium hover:text-primary transition-colors">For CPAs</a>
+          </nav>
+
+          <div className="flex items-center gap-4">
+            <Button variant="outline" onClick={handleGoogleSignIn} className="hidden sm:inline-flex">
+              Sign In
+            </Button>
+            <Button onClick={() => scrollToSection("signup")} className="hidden sm:inline-flex animate-press">
+              Get Started Free
+            </Button>
+            
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t bg-background/98 backdrop-blur">
+            <div className="container py-4 space-y-3">
+              <button onClick={() => scrollToSection("features")} className="block w-full text-left px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors">
+                Features
+              </button>
+              <button onClick={() => scrollToSection("how-it-works")} className="block w-full text-left px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors">
+                How It Works
+              </button>
+              <button onClick={() => scrollToSection("pricing")} className="block w-full text-left px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors">
+                Pricing
+              </button>
+              <a href="#" className="block w-full text-left px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors">For CPAs</a>
+              <div className="pt-2 space-y-2">
+                <Button variant="outline" onClick={handleGoogleSignIn} className="w-full">Sign In</Button>
+                <Button onClick={() => scrollToSection("signup")} className="w-full">Get Started Free</Button>
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
+      {/* Sticky Scroll CTA */}
+      {showScrollCTA && (
+        <div className="fixed bottom-6 right-6 z-40 animate-in slide-in-from-bottom-4 duration-300">
+          <Button size="lg" onClick={() => scrollToSection("signup")} className="shadow-premium-hover animate-press">
+            Get Started Free
+          </Button>
+        </div>
+      )}
+
       <main className="flex-1">
-        {/* Hero Section - Empathy First */}
-        <section className="container flex flex-col items-center gap-12 py-16 text-center lg:py-24">
-          <div className="space-y-6">
-            <h1 className="max-w-4xl text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-              Tax season doesn't have to feel like{" "}
-              <span className="text-gradient-warm">tax season</span>
-            </h1>
-            <p className="mx-auto max-w-2xl text-lg text-muted-foreground sm:text-xl">
-              We help you stay organized, feel confident, and stop worrying about missing forms.
-            </p>
-          </div>
+        {/* Hero Section - Split Layout */}
+        <section className="relative overflow-hidden py-16 lg:py-24">
+          {/* Background decoration */}
+          <div className="absolute inset-0 bg-gradient-radial opacity-50" />
+          <div className="absolute top-20 right-0 w-96 h-96 bg-sage/20 rounded-full blur-3xl" />
+          
+          <div className="container relative">
+            <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+              {/* Left: Content */}
+              <div className="space-y-8 text-center lg:text-left">
+                <div className="space-y-6">
+                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
+                    Get organized in 10 minutes.{" "}
+                    <span className="block text-primary mt-2">Never miss a tax form again.</span>
+                  </h1>
+                  <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto lg:mx-0">
+                    Save 8+ hours this tax season with AI-powered organization. Trusted by 2,500+ families and their CPAs.
+                  </p>
+                </div>
 
-          {/* Hero Illustration */}
-          <div className="w-full max-w-2xl">
-            <HeroRelaxedIllustration className="h-auto w-full" />
-          </div>
+                {/* Trust badges */}
+                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-success" />
+                    <span className="font-medium">Free forever plan</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-success" />
+                    <span className="font-medium">10-min setup</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-success" />
+                    <span className="font-medium">No credit card</span>
+                  </div>
+                </div>
 
-          {/* CTA */}
-          <div className="flex flex-col items-center gap-6">
-            <Button size="lg" className="text-lg px-8 py-6 animate-lift" onClick={() => router.push("#signup")}>
-              Start organizing for free
-            </Button>
-            <StatsTicker />
+                {/* CTAs */}
+                <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                  <Button 
+                    size="lg" 
+                    onClick={handleGoogleSignIn}
+                    className="text-lg px-8 py-6 shadow-premium hover:shadow-premium-hover animate-press w-full sm:w-auto"
+                  >
+                    Start organizing free
+                  </Button>
+                  <VideoPlayButton onClick={() => setShowVideoModal(true)} />
+                </div>
+
+                {/* Security badges */}
+                <div className="pt-4">
+                  <SecurityBadges className="justify-center lg:justify-start" />
+                </div>
+              </div>
+
+              {/* Right: Illustration */}
+              <div className="relative">
+                <div className="relative shadow-premium rounded-2xl overflow-hidden bg-gradient-subtle p-8">
+                  <HeroRelaxedIllustration className="h-auto w-full" />
+                </div>
+                {/* Floating metric */}
+                <div className="absolute -bottom-6 -left-6 lg:left-6 glass rounded-xl p-4 shadow-premium animate-float hidden sm:block">
+                  <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 rounded-full bg-success/20 flex items-center justify-center">
+                      <CheckCircle2 className="h-6 w-6 text-success" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-lg">2,500+</p>
+                      <p className="text-xs text-muted-foreground">filed stress-free</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -112,7 +274,7 @@ export default function Home() {
         </section>
 
         {/* How It Works - Story Flow */}
-        <section className="container py-20">
+        <section id="how-it-works" className="container py-20">
           <div className="mb-16 text-center">
             <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
               Four simple steps to tax peace of mind
@@ -124,8 +286,35 @@ export default function Home() {
           <HowItWorks />
         </section>
 
+        {/* Case Studies */}
+        <section className="border-t bg-muted/20 py-20">
+          <div className="container">
+            <div className="mb-16 text-center">
+              <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
+                Real people, real results
+              </h2>
+              <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+                See how TaxFlow transformed tax season for these families and professionals
+              </p>
+            </div>
+            <CaseStudies />
+          </div>
+        </section>
+
+        {/* Why TaxFlow - Differentiation */}
+        <section className="container py-20">
+          <WhyTaxFlow />
+        </section>
+
+        {/* Founder Story */}
+        <section className="border-t bg-gradient-subtle py-20">
+          <div className="container max-w-5xl">
+            <FounderStory />
+          </div>
+        </section>
+
         {/* Features Section - Benefit-First */}
-        <section className="border-t bg-muted/40 py-20">
+        <section id="features" className="border-t bg-muted/40 py-20">
           <div className="container">
             <div className="mb-12 text-center">
               <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
@@ -137,7 +326,7 @@ export default function Home() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              <Card className="animate-lift">
+              <Card className="shadow-soft hover:shadow-premium transition-all animate-lift">
                 <CardHeader>
                   <Upload className="mb-2 h-8 w-8 text-primary" />
                   <CardTitle>Your documents, instantly understood</CardTitle>
@@ -147,7 +336,7 @@ export default function Home() {
                 </CardHeader>
               </Card>
 
-              <Card className="animate-lift">
+              <Card className="shadow-soft hover:shadow-premium transition-all animate-lift">
                 <CardHeader>
                   <Brain className="mb-2 h-8 w-8 text-primary" />
                   <CardTitle>Never wonder what's missing</CardTitle>
@@ -157,7 +346,7 @@ export default function Home() {
                 </CardHeader>
               </Card>
 
-              <Card className="animate-lift">
+              <Card className="shadow-soft hover:shadow-premium transition-all animate-lift">
                 <CardHeader>
                   <Mail className="mb-2 h-8 w-8 text-primary" />
                   <CardTitle>Gentle reminders that actually work</CardTitle>
@@ -167,7 +356,7 @@ export default function Home() {
                 </CardHeader>
               </Card>
 
-              <Card className="animate-lift">
+              <Card className="shadow-soft hover:shadow-premium transition-all animate-lift">
                 <CardHeader>
                   <FileCheck className="mb-2 h-8 w-8 text-primary" />
                   <CardTitle>Hand it off like a pro</CardTitle>
@@ -176,47 +365,33 @@ export default function Home() {
                   </CardDescription>
                 </CardHeader>
               </Card>
-
-              <Card className="animate-lift">
-                <CardHeader>
-                  <Shield className="mb-2 h-8 w-8 text-primary" />
-                  <CardTitle>Bank-level security for your peace of mind</CardTitle>
-                  <CardDescription>
-                    Your sensitive tax data stays private with enterprise-grade encryption. We never sell your data.
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-
-              <Card className="animate-lift">
-                <CardHeader>
-                  <CheckCircle2 className="mb-2 h-8 w-8 text-success" />
-                  <CardTitle>Set it and relax</CardTitle>
-                  <CardDescription>
-                    Connect Gmail or Drive once, and we'll automatically find tax documents as they arrive. Zero effort.
-                  </CardDescription>
-                </CardHeader>
-              </Card>
             </div>
           </div>
         </section>
 
+        {/* Early Access / Email Capture */}
+        <section className="container py-20">
+          <EarlyAccess />
+        </section>
+
         {/* Pricing Section - Value Positioning */}
-        <section id="pricing" className="container py-20">
-          <div className="mb-12 text-center">
-            <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
-              Choose your level of confidence
-            </h2>
-            <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-              Start free, upgrade when you're ready for more peace of mind
-            </p>
-            <div className="mt-6 flex justify-center">
-              <GuaranteeBanner />
+        <section id="pricing" className="border-t bg-gradient-subtle py-20">
+          <div className="container">
+            <div className="mb-12 text-center">
+              <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
+                Choose your level of confidence
+              </h2>
+              <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+                Start free, upgrade when you're ready for more peace of mind
+              </p>
+              <div className="mt-6 flex justify-center">
+                <GuaranteeBanner />
+              </div>
             </div>
-          </div>
 
           <div className="grid gap-8 md:grid-cols-3">
             {/* Free Plan */}
-            <Card className="relative animate-lift">
+            <Card className="relative shadow-soft hover:shadow-premium transition-all animate-lift">
               <CardHeader>
                 <CardTitle className="text-2xl">Start with peace of mind</CardTitle>
                 <CardDescription className="text-base">Just getting organized</CardDescription>
@@ -245,16 +420,16 @@ export default function Home() {
                     <span>Export package for your CPA</span>
                   </li>
                 </ul>
-                <Button className="w-full" variant="outline" onClick={() => router.push("#signup")}>
-                  Get Started Free
+                <Button className="w-full animate-press" variant="outline" onClick={handleGoogleSignIn}>
+                  Get started free
                 </Button>
               </CardContent>
             </Card>
 
-            {/* Basic Plan */}
-            <Card className="relative border-2 border-primary shadow-lg animate-lift scale-105">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                <Badge className="bg-warning text-warning-foreground px-4 py-1 text-sm font-semibold">
+            {/* Basic Plan - Most Popular */}
+            <Card className="relative border-2 border-primary shadow-premium-hover animate-lift scale-105 shadow-glow-amber">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+                <Badge className="bg-warning text-warning-foreground px-4 py-1 text-sm font-semibold shadow-premium">
                   Most Popular
                 </Badge>
               </div>
@@ -290,14 +465,14 @@ export default function Home() {
                     <span>Smart checklist that learns your situation</span>
                   </li>
                 </ul>
-                <Button className="w-full" onClick={() => router.push("#signup")}>
-                  Start Free Trial
+                <Button className="w-full animate-press shadow-premium" onClick={handleGoogleSignIn}>
+                  Get started free
                 </Button>
               </CardContent>
             </Card>
 
             {/* Pro Plan */}
-            <Card className="relative animate-lift">
+            <Card className="relative shadow-soft hover:shadow-premium transition-all animate-lift">
               <CardHeader>
                 <CardTitle className="text-2xl">Work with your CPA like a pro</CardTitle>
                 <CardDescription className="text-base">Complex taxes or small business</CardDescription>
@@ -330,20 +505,26 @@ export default function Home() {
                     <span><strong>Priority email support</strong></span>
                   </li>
                 </ul>
-                <Button className="w-full" variant="outline" onClick={() => router.push("#signup")}>
-                  Start Free Trial
+                <Button className="w-full animate-press" variant="outline" onClick={handleGoogleSignIn}>
+                  Get started free
                 </Button>
               </CardContent>
             </Card>
           </div>
 
-          <p className="mt-12 text-center text-sm text-muted-foreground">
-            All plans include bank-level encryption, secure storage, and we never sell your data.
-          </p>
+            <p className="mt-12 text-center text-sm text-muted-foreground">
+              All plans include bank-level encryption, secure storage, and we never sell your data.
+            </p>
+
+            {/* Pricing FAQ */}
+            <div className="mt-20">
+              <PricingFAQ />
+            </div>
+          </div>
         </section>
 
         {/* Sign Up Section - Trust First */}
-        <section id="signup" className="border-t bg-gradient-subtle py-20">
+        <section id="signup" className="border-t py-20">
           <div className="container max-w-xl text-center">
             <h2 className="mb-4 text-3xl font-bold">Join 2,500+ people who stopped stressing about taxes</h2>
             <p className="mb-4 text-muted-foreground">
@@ -357,8 +538,13 @@ export default function Home() {
             </div>
 
             <div className="space-y-4">
-              <Button variant="outline" className="w-full h-12 text-base" onClick={handleGoogleSignIn}>
-                <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
+              <Button 
+                variant="outline" 
+                className="w-full h-12 text-base animate-press shadow-soft hover:shadow-premium transition-all" 
+                onClick={handleGoogleSignIn}
+                aria-label="Sign in with Google"
+              >
+                <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
                   <path
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                     fill="#4285F4"
@@ -384,20 +570,28 @@ export default function Home() {
                   <span className="w-full border-t" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-gradient-subtle px-2 text-muted-foreground">Or</span>
+                  <span className="bg-background px-2 text-muted-foreground">Or</span>
                 </div>
               </div>
 
-              <div className="flex gap-2">
-                <input
+              <div className="flex flex-col sm:flex-row gap-2">
+                <label htmlFor="signup-email" className="sr-only">Email address</label>
+                <Input
+                  id="signup-email"
                   type="email"
                   placeholder="your@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="flex h-12 w-full rounded-md border border-input bg-background px-4 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="h-12 shadow-inset flex-1"
                   onKeyDown={(e) => e.key === "Enter" && handleSignIn()}
+                  aria-label="Email address for magic link"
                 />
-                <Button onClick={handleSignIn} disabled={loading || !email} className="h-12 px-6">
+                <Button 
+                  onClick={handleSignIn} 
+                  disabled={loading || !email} 
+                  className="h-12 px-6 animate-press"
+                  aria-label={loading ? "Sending magic link" : "Send magic link to email"}
+                >
                   {loading ? "Sending..." : "Send Link"}
                 </Button>
               </div>
@@ -407,7 +601,7 @@ export default function Home() {
             </div>
 
             <p className="mt-8 text-xs text-muted-foreground">
-              By signing up, you agree to our Terms of Service and Privacy Policy.
+              By signing up, you agree to our <a href="/terms" className="underline hover:text-foreground">Terms of Service</a> and <a href="/privacy" className="underline hover:text-foreground">Privacy Policy</a>.
             </p>
           </div>
         </section>
@@ -422,32 +616,47 @@ export default function Home() {
               <p className="text-sm text-muted-foreground">
                 Tax season doesn't have to feel like tax season.
               </p>
+              {/* Newsletter signup */}
+              <div className="pt-2">
+                <p className="text-xs font-semibold mb-2">Stay updated</p>
+                <div className="flex gap-2">
+                  <Input 
+                    type="email" 
+                    placeholder="your@email.com" 
+                    className="h-9 text-sm"
+                    aria-label="Newsletter email"
+                  />
+                  <Button size="sm" variant="outline" className="whitespace-nowrap">
+                    Subscribe
+                  </Button>
+                </div>
+              </div>
             </div>
             
             <div>
               <h4 className="font-semibold mb-3">Product</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#pricing" className="hover:text-primary transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">FAQ</a></li>
+                <li><button onClick={() => scrollToSection("pricing")} className="hover:text-primary transition-colors">Pricing</button></li>
+                <li><button onClick={() => scrollToSection("features")} className="hover:text-primary transition-colors">Features</button></li>
+                <li><button onClick={() => scrollToSection("how-it-works")} className="hover:text-primary transition-colors">How It Works</button></li>
+                <li><button onClick={() => scrollToSection("pricing")} className="hover:text-primary transition-colors">FAQ</button></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-3">Trust & Security</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary transition-colors">Security</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Terms of Service</a></li>
+                <li><a href="/security" className="hover:text-primary transition-colors">Security</a></li>
+                <li><a href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</a></li>
+                <li><a href="/terms" className="hover:text-primary transition-colors">Terms of Service</a></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-3">Support</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Contact Us</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">For CPAs</a></li>
+                <li><a href="mailto:support@taxflow.com" className="hover:text-primary transition-colors">Contact Us</a></li>
+                <li><a href="/for-cpas" className="hover:text-primary transition-colors">For CPAs</a></li>
               </ul>
             </div>
           </div>
