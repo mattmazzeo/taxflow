@@ -9,7 +9,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CheckCircle2, Upload, Brain, Mail, FileCheck, Shield, Menu, X } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
-import { HeroRelaxedIllustration } from "@/components/illustrations/hero-relaxed";
 import { Testimonials } from "@/components/landing/testimonials";
 import { StatsTicker } from "@/components/landing/stats-ticker";
 import { HowItWorks } from "@/components/landing/how-it-works";
@@ -23,6 +22,7 @@ import { FounderStory } from "@/components/landing/founder-story";
 import { EarlyAccess } from "@/components/landing/early-access";
 import { ExitIntentModal, useExitIntent } from "@/components/landing/exit-intent";
 import { toast } from "sonner";
+import Image from "next/image";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -235,8 +235,16 @@ export default function Home() {
 
               {/* Right: Illustration */}
               <div className="relative">
-                <div className="relative shadow-premium rounded-2xl overflow-hidden bg-gradient-subtle p-8">
-                  <HeroRelaxedIllustration className="h-auto w-full" />
+                <div className="relative shadow-premium rounded-2xl overflow-hidden bg-gradient-subtle p-1">
+                   <div className="relative w-full aspect-square lg:aspect-[4/3] overflow-hidden rounded-xl bg-muted/50">
+                    <Image 
+                      src="/hero-3d.png" 
+                      alt="TaxFlow Organization Peace of Mind" 
+                      fill
+                      className="object-cover hover:scale-105 transition-transform duration-700"
+                      priority
+                    />
+                  </div>
                 </div>
                 {/* Floating metric */}
                 <div className="absolute -bottom-6 -left-6 lg:left-6 glass rounded-xl p-4 shadow-premium animate-float hidden sm:block">
