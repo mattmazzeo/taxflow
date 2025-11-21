@@ -236,7 +236,7 @@ export default function Home() {
               {/* Right: Illustration */}
               <div className="relative">
                 <div className="relative shadow-premium rounded-2xl overflow-hidden bg-gradient-subtle p-1">
-                   <div className="relative w-full aspect-square lg:aspect-[4/3] overflow-hidden rounded-xl bg-muted/50">
+                   <div className="relative w-full aspect-video overflow-hidden rounded-xl bg-muted/50">
                     <Image 
                       src="/hero-3d.png" 
                       alt="TaxFlow Organization Peace of Mind" 
